@@ -1,0 +1,159 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Questão {{ questao_numero }} - Quiz{% endblock %}
+
+{% block content %}
+<style>
+    .quiz-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: white;
+        border-radius: 5px;
+        transition: width 0.3s;
+    }
+    
+    .questao-box {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .questao-box h3 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 1.2em;
+    }
+    
+    .questao-texto {
+        color: #444;
+        font-size: 1.1em;
+        line-height: 1.6;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .alternativas {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .alternativa {
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+    }
+    
+    .alternativa:hover {
+        border-color: #667eea;
+        background: #f0f4ff;
+        transform: translateX(5px);
+    }
+    
+    .alternativa input[type="radio"] {
+        margin-right: 15px;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    
+    .alternativa label {
+        cursor: pointer;
+        flex: 1;
+        font-size: 1.05em;
+        color: #333;
+    }
+    
+    .form-actions {
+        margin-top: 30px;
+        text-align: center;
+    }
+    
+    .btn-responder {
+        padding: 15px 50px;
+        font-size: 1.1em;
+    }
+</style>
+
+<div class="quiz-header">
+    <div class="progress-info">
+        <span>📝 Questão {{ questao_numero }} de {{ total_questoes }}</span>
+        <span>⭐ Pontos: {{ pontos }}</span>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: {% widthratio questao_numero total_questoes 100 %}%;"></div>
+    </div>
+</div>
+
+<div class="questao-box">
+    <h3>{{ questao.categoria.nome }} - {{ questao.dificuldade|capfirst }}</h3>
+    <div class="questao-texto">
+        {{ questao.pergunta }}
+    </div>
+</div>
+
+<form method="post" id="quiz-form">
+    {% csrf_token %}
+    <div class="alternativas">
+        {% for alternativa in alternativas %}
+        <div class="alternativa" onclick="document.getElementById('alt-{{ alternativa.id }}').checked = true;">
+            <input type="radio" 
+                   name="alternativa" 
+                   id="alt-{{ alternativa.id }}" 
+                   value="{{ alternativa.id }}"
+                   required>
+            <label for="alt-{{ alternativa.id }}">{{ alternativa.texto }}</label>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="form-actions">
+        <button type="submit" class="btn btn-responder">Responder ✅</button>
+    </div>
+</form>
+
+<script>
+    document.getElementById('quiz-form').onsubmit = function(e) {
+        e.preventDefault();
+        const selectedRadio = document.querySelector('input[name="alternativa"]:checked');
+        if (selectedRadio) {
+            const form = this;
+            form.action = '/responder/' + selectedRadio.value + '/';
+            form.submit();
+        }
+    };
+</script>
+{% endblock %}

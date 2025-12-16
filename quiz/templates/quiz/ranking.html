@@ -1,0 +1,204 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Ranking - Quiz de Programação{% endblock %}
+
+{% block content %}
+<style>
+    .ranking-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .ranking-header h2 {
+        color: #667eea;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+    
+    .ranking-table {
+        width: 100%;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .ranking-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .ranking-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .ranking-table th {
+        padding: 20px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 1.1em;
+    }
+    
+    .ranking-table th:first-child {
+        text-align: center;
+        width: 80px;
+    }
+    
+    .ranking-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .ranking-table tbody tr:hover {
+        background: #f0f4ff;
+    }
+    
+    .ranking-table tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    .ranking-table td {
+        padding: 20px;
+    }
+    
+    .ranking-table td:first-child {
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.3em;
+    }
+    
+    .posicao-1 {
+        color: #FFD700;
+        font-size: 1.5em !important;
+    }
+    
+    .posicao-2 {
+        color: #C0C0C0;
+        font-size: 1.4em !important;
+    }
+    
+    .posicao-3 {
+        color: #CD7F32;
+        font-size: 1.3em !important;
+    }
+    
+    .usuario-nome {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1em;
+    }
+    
+    .categoria-badge {
+        display: inline-block;
+        background: #e0e0e0;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.9em;
+        color: #666;
+    }
+    
+    .pontos {
+        color: #667eea;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    
+    .stats {
+        color: #666;
+        font-size: 0.9em;
+    }
+    
+    .no-ranking {
+        text-align: center;
+        padding: 60px 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .no-ranking p {
+        color: #666;
+        font-size: 1.2em;
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .ranking-table {
+            overflow-x: auto;
+        }
+        
+        .ranking-table th,
+        .ranking-table td {
+            padding: 12px 8px;
+            font-size: 0.9em;
+        }
+    }
+</style>
+
+<div class="ranking-header">
+    <h2>🏆 Ranking Geral</h2>
+    <p>Veja os melhores desempenhos de todos os tempos!</p>
+</div>
+
+{% if pontuacoes %}
+<div class="ranking-table">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Usuário</th>
+                <th>Categoria</th>
+                <th>Pontos</th>
+                <th>Desempenho</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pontuacao in pontuacoes %}
+            <tr>
+                <td>
+                    <span class="{% if forloop.counter == 1 %}posicao-1{% elif forloop.counter == 2 %}posicao-2{% elif forloop.counter == 3 %}posicao-3{% endif %}">
+                        {% if forloop.counter == 1 %}
+                            🥇
+                        {% elif forloop.counter == 2 %}
+                            🥈
+                        {% elif forloop.counter == 3 %}
+                            🥉
+                        {% else %}
+                            {{ forloop.counter }}
+                        {% endif %}
+                    </span>
+                </td>
+                <td>
+                    <span class="usuario-nome">{{ pontuacao.usuario.username }}</span>
+                </td>
+                <td>
+                    <span class="categoria-badge">{{ pontuacao.categoria.nome }}</span>
+                </td>
+                <td>
+                    <span class="pontos">{{ pontuacao.pontos_totais }} pts</span>
+                </td>
+                <td>
+                    <span class="stats">
+                        {{ pontuacao.questoes_corretas }}/{{ pontuacao.questoes_respondidas }} 
+                        ({{ pontuacao.percentual_acerto|floatformat:0 }}%)
+                    </span>
+                </td>
+                <td>
+                    <span class="stats">{{ pontuacao.data_quiz|date:"d/m/Y H:i" }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="no-ranking">
+    <p>🎯 O ranking ainda está vazio!</p>
+    <p>Seja o primeiro a completar um quiz e aparecer aqui!</p>
+    <div style="margin-top: 30px;">
+        <a href="{% url 'home' %}" class="btn">Começar Quiz</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

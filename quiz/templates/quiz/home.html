@@ -1,0 +1,101 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Início - Quiz de Programação{% endblock %}
+
+{% block content %}
+<style>
+    .welcome {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .welcome h2 {
+        color: #667eea;
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+    
+    .categorias-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+    
+    .categoria-card {
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .categoria-card:hover {
+        transform: translateY(-5px);
+        border-color: #667eea;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .categoria-card h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.5em;
+    }
+    
+    .categoria-card p {
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+    
+    .no-categorias {
+        text-align: center;
+        padding: 40px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .no-categorias p {
+        color: #666;
+        font-size: 1.2em;
+    }
+</style>
+
+<div class="welcome">
+    {% if user.is_authenticated %}
+        <h2>Bem-vindo de volta, {{ user.username }}! 👨‍💻</h2>
+        <p>Escolha uma categoria e comece a testar seus conhecimentos</p>
+    {% else %}
+        <h2>Bem-vindo ao Quiz de Programação! 🚀</h2>
+        <p>Faça login para começar a resolver questões e aparecer no ranking</p>
+        <div style="margin-top: 20px;">
+            <a href="{% url 'login' %}" class="btn">Fazer Login</a>
+            <a href="{% url 'registro' %}" class="btn btn-secondary">Criar Conta</a>
+        </div>
+    {% endif %}
+</div>
+
+{% if categorias %}
+    <h2 style="color: #333; margin-bottom: 20px;">📚 Categorias Disponíveis</h2>
+    <div class="categorias-grid">
+        {% for categoria in categorias %}
+        <div class="categoria-card">
+            <h3>{{ categoria.nome }}</h3>
+            <p>{{ categoria.descricao|default:"Teste seus conhecimentos nesta categoria!" }}</p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'iniciar_quiz' categoria.id %}" class="btn">Começar Quiz</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn">Fazer Login para Jogar</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="no-categorias">
+        <p>⚠️ Ainda não há categorias disponíveis.</p>
+        <p>Entre em contato com o administrador para adicionar questões.</p>
+    </div>
+{% endif %}
+{% endblock %}
